@@ -1,53 +1,74 @@
 @model IEnumerable<LogiTrack.Models.WarehouseAudit>
 
+@{
+    ViewData["Title"] = "Warehouse Audit Trail";
+}
+
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Header Section matching Screen 6 logic[cite: 1] -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="text-primary">Warehouse Audit Trail</h2>
-            <p class="text-muted small">Chain of Custody Tracking | ST10442488</p>
+            <h2 class="text-primary fw-bold">Warehouse Audit Trail</h2>
+            <p class="text-muted">Chain of Custody Tracking | Adrian Chetty (ST10442488)</p>
         </div>
-        <a href="@Url.Action("LogMovement")" class="btn btn-primary" style="background-color: #0056b3;">Log New Movement</a>
+        <a asp-action="LogMovement" class="btn btn-primary px-4" style="background-color: #0056b3; border-radius: 4px;">
+            + Log New Movement
+        </a>
     </div>
 
-    <!-- Filter Bar -->
-    <div class="card mb-4 border-0 shadow-sm">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-8">
-                    <input type="text" name="searchString" class="form-control" placeholder="Search Tracking Number..." />
+    <!-- Searchable Filters Section[cite: 1] -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 8px;">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get" class="row g-3">
+                <div class="col-md-9">
+                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" 
+                           class="form-control border-secondary-subtle" 
+                           placeholder="Enter Tracking Number (e.g. LOG-9842-01)..." />
                 </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-outline-primary w-100">Filter Trail</button>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-dark w-100">Search Trail</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Audit Table -->
-    <div class="table-responsive bg-white rounded shadow-sm">
-        <table class="table table-hover align-middle mb-0">
-            <thead style="background-color: #f8f9fa;">
-                <tr>
-                    <th class="border-0">Timestamp</th>
-                    <th class="border-0">Tracking Number</th>
-                    <th class="border-0">Status</th>
-                    <th class="border-0">Location</th>
-                    <th class="border-0">Operator</th>
+    <!-- Chronological Audit Table[cite: 1] -->
+    <div class="table-responsive shadow-sm bg-white" style="border-radius: 8px; border: 1px solid #dee2e6;">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr style="font-family: 'Segoe UI', sans-serif;">
+                    <th class="ps-4">Timestamp</th>
+                    <th>Tracking Number</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                    <th>Operator</th>
+                    <th class="text-end pe-4">Actions</th>
                 </tr>
             </thead>
             <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">No audit logs found matching your search.</td>
+                    </tr>
+                }
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td class="text-muted">@item.Timestamp.ToString("HH:mm:ss")</td>
-                        <td class="fw-bold">@item.TrackingNumber</td>
+                        <td class="ps-4 text-muted">@item.Timestamp.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                        <td class="fw-bold text-primary">@item.TrackingNumber</td>
                         <td>
-                            <span class="badge @(item.Status == "Inbound" ? "bg-success" : "bg-info") rounded-pill">
+                            <!-- Status Badges with color coding as per Design Logic 2.2[cite: 1] -->
+                            <span class="badge rounded-pill @(item.Status == "Inbound" ? "bg-success" : "bg-primary")" 
+                                  style="font-weight: 500; padding: 6px 12px;">
                                 @item.Status
                             </span>
                         </td>
                         <td>@item.Location</td>
-                        <td>@item.OperatorName</td>
+                        <td><i class="bi bi-person-badge me-1"></i> @item.OperatorName</td>
+                        <td class="text-end pe-4">
+                            <a asp-action="Details" asp-route-id="@item.LogId" class="text-decoration-none small me-2">Details</a>
+                        </td>
                     </tr>
                 }
             </tbody>
