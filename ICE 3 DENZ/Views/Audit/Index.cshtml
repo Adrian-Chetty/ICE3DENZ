@@ -1,5 +1,56 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+@model IEnumerable<LogiTrack.Models.WarehouseAudit>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="text-primary">Warehouse Audit Trail</h2>
+            <p class="text-muted small">Chain of Custody Tracking | ST10442488</p>
+        </div>
+        <a href="@Url.Action("LogMovement")" class="btn btn-primary" style="background-color: #0056b3;">Log New Movement</a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" name="searchString" class="form-control" placeholder="Search Tracking Number..." />
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-primary w-100">Filter Trail</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Audit Table -->
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead style="background-color: #f8f9fa;">
+                <tr>
+                    <th class="border-0">Timestamp</th>
+                    <th class="border-0">Tracking Number</th>
+                    <th class="border-0">Status</th>
+                    <th class="border-0">Location</th>
+                    <th class="border-0">Operator</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="text-muted">@item.Timestamp.ToString("HH:mm:ss")</td>
+                        <td class="fw-bold">@item.TrackingNumber</td>
+                        <td>
+                            <span class="badge @(item.Status == "Inbound" ? "bg-success" : "bg-info") rounded-pill">
+                                @item.Status
+                            </span>
+                        </td>
+                        <td>@item.Location</td>
+                        <td>@item.OperatorName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
